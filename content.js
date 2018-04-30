@@ -1,11 +1,18 @@
+'use strict';
 console.log('hello world')
-var bookmarks = currentBookmarks = [];
+
+var bookmarks = [];
+var currentBookmarks = [];
 var currentSelected = 0;
 var STEP = 42;
 var KEY_CODE = {
+  ENTER: 13,
   ARROW_UP: 38,
   ARROW_DOWN: 40,
+  DELETE: 8,
+  A: 65,
   B: 66,
+  Z: 90,
 };
 
 chrome.runtime.sendMessage({type: 'GET_BOOKMARKS'} ,function (response) {
@@ -16,26 +23,36 @@ chrome.runtime.sendMessage({type: 'GET_BOOKMARKS'} ,function (response) {
 function createBookmarkList(bookmarks) {
   var list = document.createElement('ul');
   list.className = 'bookmark-list';
-  bookmarks.forEach(function(bookmark) {
+  bookmarks.forEach(function(bookmark, index) {
     var li = document.createElement('li');
     li.className = 'bookmark-list-item';
     li.innerHTML = bookmark.title;
     list.appendChild(li);
+    if (index === 0) {
+      li.className += ' active';
+    }
   });
   return list;
 }
 
+function resetSelect() {
+  currentSelected = 0;
+}
+
 function onInputChange(event) {
-  if (event.keyCode === KEY_CODE.ARROW_DOWN || event.keyCode === KEY_CODE.ARROW_UP) {
+  var keyCode = event.keyCode;
+  if ((keyCode >= KEY_CODE.A && keyCode <= KEY_CODE.Z) || keyCode === KEY_CODE.DELETE) {
+    var input = $(this).val();
+    currentBookmarks = bookmarks.filter(function (bookmark) {
+      return bookmark.title.toLowerCase().indexOf(input) !== -1;
+    });
+    var newBookmarkList = createBookmarkList(currentBookmarks);
+    $('.bookmark-list').replaceWith(newBookmarkList);
+    resetSelect();
+  } else {
     $('.bookmark-list').blur();
     return;
   }
-  var input = $(this).val();
-  currentBookmarks = bookmarks.filter(function (bookmark) {
-    return bookmark.title.toLowerCase().indexOf(input) !== -1;
-  });
-  var newBookmarkList = createBookmarkList(currentBookmarks);
-  $('.bookmark-list').replaceWith(newBookmarkList);
 }
 
 $(document).on('keydown', function (event) {
@@ -53,6 +70,7 @@ $(document).on('keydown', function (event) {
     $('body').append(bookmarkWrap);
     $('.bookmark-input').on('keyup', onInputChange);
     $('.bookmark-input').on('keydown', onSelectBookmark);
+    $('.bookmark-input').on('keydown', onMakeBookmark);
   }
 });
 
@@ -71,6 +89,15 @@ function onSelectBookmark(event) {
       scrollDown();
     }
     $('.bookmark-list li').eq(currentSelected).addClass('active');
+  }
+}
+
+function onMakeBookmark(event) {
+  event.stopPropagation();
+  var keyCode = event.keyCode;
+  if ($('.bookmark-wrap').length && keyCode === KEY_CODE.ENTER &&currentBookmarks.length > 0) {
+    var selectedBookmark = currentBookmarks[currentSelected];
+    alert(selectedBookmark.title);
   }
 }
 
