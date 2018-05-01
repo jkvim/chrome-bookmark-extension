@@ -1,5 +1,4 @@
 'use strict';
-console.log('hello world')
 
 var bookmarks = [];
 var currentBookmarks = [];
@@ -17,7 +16,6 @@ var KEY_CODE = {
 
 chrome.runtime.sendMessage({type: 'GET_BOOKMARKS'} ,function (response) {
   bookmarks = response.bookmarks[0].children[0].children;
-  console.log('bookmarks', bookmarks);
 });
 
 function createBookmarkList(bookmarks) {
@@ -97,7 +95,14 @@ function onMakeBookmark(event) {
   var keyCode = event.keyCode;
   if ($('.bookmark-wrap').length && keyCode === KEY_CODE.ENTER &&currentBookmarks.length > 0) {
     var selectedBookmark = currentBookmarks[currentSelected];
-    alert(selectedBookmark.title);
+    var payload = {
+      parentId: selectedBookmark.id,
+      title: document.title,
+      url: window.location.href
+    };
+    chrome.runtime.sendMessage({type: 'CREATE_BOOKMARK', payload: payload }, function (response) {
+      console.log('create success');
+    });
   }
 }
 

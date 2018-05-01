@@ -5,16 +5,18 @@
 'use strict';
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-  console.log(
-    sender.tab
-      ? 'from a content script:' + sender.tab.url
-      : 'from the extension'
-  );
   if (request.type == 'GET_BOOKMARKS') {
     chrome.bookmarks.getTree(function(tree) {
-      console.log('tree', tree);
       sendResponse({ bookmarks: tree });
     });
+  }
+  if (request.type === 'CREATE_BOOKMARK') {
+    chrome.bookmarks.create({
+      parentId: request.payload.parentId,
+      title: request.payload.title,
+      url: request.payload.url
+    })
+    sendResponse({ status: 'OK' });
   }
   return true;
 });
