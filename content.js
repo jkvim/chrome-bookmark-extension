@@ -56,10 +56,6 @@ function onInputChange(event) {
 
 $(document).on('keydown', function (event) {
   var hasCreated = $('.bookmark-wrap').length;
-  if (event.keyCode === KEY_CODE.ESC && hasCreated) {
-    $('.bookmark-wrap').remove();
-    return;
-  }
 
   if (event.keyCode === KEY_CODE.B && event.metaKey && !hasCreated) {
     $('input').blur();
@@ -76,9 +72,14 @@ $(document).on('keydown', function (event) {
     $('.bookmark-input').on('keyup', onInputChange);
     $('.bookmark-input').on('keydown', onSelectBookmark);
     $('.bookmark-input').on('keydown', onMakeBookmark);
+    $('.bookmark-input').on('blur', removeExtension);
     $('.bookmark-input').focus();
   }
 });
+
+function removeExtension(event) {
+  $('.bookmark-wrap').remove();
+}
 
 function onSelectBookmark(event) {
   event.stopPropagation();
