@@ -5,6 +5,7 @@ var currentBookmarks = [];
 var currentSelected = 0;
 var STEP = 42;
 var KEY_CODE = {
+  ESC: 27,
   ENTER: 13,
   ARROW_UP: 38,
   ARROW_DOWN: 40,
@@ -54,7 +55,13 @@ function onInputChange(event) {
 }
 
 $(document).on('keydown', function (event) {
-  if (event.keyCode === KEY_CODE.B && event.metaKey) {
+  var hasCreated = $('.bookmark-wrap').length;
+  if (event.keyCode === KEY_CODE.ESC && hasCreated) {
+    $('.bookmark-wrap').remove();
+    return;
+  }
+
+  if (event.keyCode === KEY_CODE.B && event.metaKey && !hasCreated) {
     $('input').blur();
     var bookmarkInput = document.createElement('input');
     var bookmarkWrap = document.createElement('div');
@@ -69,6 +76,7 @@ $(document).on('keydown', function (event) {
     $('.bookmark-input').on('keyup', onInputChange);
     $('.bookmark-input').on('keydown', onSelectBookmark);
     $('.bookmark-input').on('keydown', onMakeBookmark);
+    $('.bookmark-input').focus();
   }
 });
 
@@ -101,7 +109,7 @@ function onMakeBookmark(event) {
       url: window.location.href
     };
     chrome.runtime.sendMessage({type: 'CREATE_BOOKMARK', payload: payload }, function (response) {
-      console.log('create success');
+      alert('create success');
     });
   }
 }
