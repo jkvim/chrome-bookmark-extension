@@ -22,13 +22,18 @@
   width: 500px;
   overflow: scroll;
   margin-top: 10px;
+  padding: 0;
+  list-style: none;
 }
 
 .bookmark-list-item {
   text-align: left;
   font-size: 18px;
   padding: 10px;
+  height: 42px;
   border-bottom: 1px solid #ccc;
+  box-sizing: border-box;
+  white-space: nowrap;
 }
 
 .bookmark-list-item.active {
