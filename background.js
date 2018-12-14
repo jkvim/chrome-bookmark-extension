@@ -4,6 +4,14 @@
 
 'use strict';
 
+function createBookmark(parentId, title, url, callback) {
+  chrome.bookmarks.create({
+    parentId: parentId,
+    title: title,
+    url: url
+  }, callback)
+}
+
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   if (request.type == 'GET_BOOKMARKS') {
     chrome.bookmarks.getTree(function(tree) {
@@ -11,12 +19,20 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     });
   }
   if (request.type === 'CREATE_BOOKMARK') {
-    chrome.bookmarks.create({
-      parentId: request.payload.parentId,
-      title: request.payload.title,
-      url: request.payload.url
-    })
+    const { parentId, title, url} = request.payload
+    createBookmark(parentId, title, url)
     sendResponse({ status: 'OK' });
+  }
+  if (request.type === 'CREATE_FOLDER') {
+    chrome.bookmarks.create({
+      parentId: '1',
+      title: request.payload.folderName,
+    }, function (newFolder) {
+      const { title, url } = request.payload
+      createBookmark(newFolder.id, title, url, function () {
+        sendResponse({ status: 'OK' });
+      })
+    })
   }
   return true;
 });

@@ -113,6 +113,17 @@ function onMakeBookmark(event) {
       alert('create success');
     });
   }
+  if ($('.bookmark-warp').length === 0 && keyCode === KEY_CODE.ENTER) {
+    var folderName = $('.bookmark-input').val()
+    var payload = {
+      folderName: folderName,
+      title: document.title,
+      url: window.location.href
+    }
+    chrome.runtime.sendMessage({type: 'CREATE_FOLDER', payload: payload }, function () {
+      alert('create success')
+    })
+  }
 }
 
 function scrollUp() {
