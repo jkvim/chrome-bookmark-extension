@@ -113,7 +113,7 @@ function onMakeBookmark(event) {
       alert('create success');
     });
   }
-  if ($('.bookmark-warp').length === 0 && keyCode === KEY_CODE.ENTER) {
+  if ($('.bookmark-warp').length === 0 && keyCode === KEY_CODE.ENTER && currentBookmarks.length === 0) {
     var folderName = $('.bookmark-input').val()
     var payload = {
       folderName: folderName,
